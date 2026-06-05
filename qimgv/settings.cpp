@@ -353,6 +353,47 @@ QStringList Settings::supportedMimeTypes() {
     return filters;
 }
 //------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+bool Settings::enableVideoPreviews() {
+#ifdef USE_MPV
+    return settings->settingsConf->value("enableVideoPreviews", false).toBool();
+#else
+    return false;
+#endif
+}
+
+void Settings::setEnableVideoPreviews(bool mode) {
+    settings->settingsConf->setValue("enableVideoPreviews", mode);
+}
+
+int Settings::previewDurationLimit() {
+    return settings->settingsConf->value("previewDurationLimit", 0).toInt();
+}
+
+void Settings::setPreviewDurationLimit(int limit) {
+    settings->settingsConf->setValue("previewDurationLimit", limit);
+}
+
+VideoPreviewMode Settings::videoPreviewMode() {
+    int mode = settings->settingsConf->value("videoPreviewMode", 0).toInt();
+    if(mode < 0 || mode > 1)
+        mode = 0;
+    return static_cast<VideoPreviewMode>(mode);
+}
+
+void Settings::setVideoPreviewMode(VideoPreviewMode mode) {
+    settings->settingsConf->setValue("videoPreviewMode", mode);
+}
+
+bool Settings::selectedVideoSound() {
+    return settings->settingsConf->value("selectedVideoSound", false).toBool();
+}
+
+void Settings::setSelectedVideoSound(bool mode) {
+    settings->settingsConf->setValue("selectedVideoSound", mode);
+}
+
 bool Settings::videoPlayback() {
 #ifdef USE_MPV
     return settings->settingsConf->value("videoPlayback", true).toBool();

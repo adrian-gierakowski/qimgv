@@ -96,6 +96,12 @@ enum ThumbPanelStyle {
     TH_PANEL_EXTENDED
 };
 
+
+enum VideoPreviewMode {
+    VP_PLAY_ALL,
+    VP_PLAY_SELECTED
+};
+
 class Settings : public QObject
 {
     Q_OBJECT
@@ -233,6 +239,16 @@ public:
     const ColorScheme& colorScheme();
     void setColorScheme(ColorScheme scheme);
     void setColorTid(int tid);
+
+
+    bool enableVideoPreviews();
+    void setEnableVideoPreviews(bool mode);
+    int previewDurationLimit();
+    void setPreviewDurationLimit(int limit);
+    VideoPreviewMode videoPreviewMode();
+    void setVideoPreviewMode(VideoPreviewMode mode);
+    bool selectedVideoSound();
+    void setSelectedVideoSound(bool mode);
 
     bool videoPlayback();
     void setVideoPlayback(bool mode);

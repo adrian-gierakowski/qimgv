@@ -28,6 +28,8 @@ ThumbnailWidgetCmp::ThumbnailWidgetCmp(QGraphicsItem *parent) :
 void ThumbnailWidgetCmp::setThumbnailSize(int size) {
     if(mThumbnailSize != size && size > 0) {
         isLoaded = false;
+    m_videoPreviewing = false;
+    m_currentVideoFrame = QPixmap();
         mThumbnailSize = size;
         updateBoundingRect();
         updateGeometry();
@@ -59,6 +61,8 @@ void ThumbnailWidgetCmp::reset() {
     highlighted = false;
     hovered = false;
     isLoaded = false;
+    m_videoPreviewing = false;
+    m_currentVideoFrame = QPixmap();
     update();
 }
 
@@ -112,10 +116,30 @@ void ThumbnailWidgetCmp::setThumbnail(std::shared_ptr<Thumbnail> _thumbnail) {
     }
 }
 
+
+void ThumbnailWidgetCmp::setVideoFrame(const QPixmap &pixmap) {
+    m_currentVideoFrame = pixmap;
+    update();
+}
+
+bool ThumbnailWidgetCmp::isVideoPreviewing() const {
+    return m_videoPreviewing;
+}
+
+void ThumbnailWidgetCmp::setVideoPreviewing(bool mode) {
+    m_videoPreviewing = mode;
+    if (!mode) {
+        m_currentVideoFrame = QPixmap();
+        update();
+    }
+}
+
 void ThumbnailWidgetCmp::unsetThumbnail() {
     if(thumbnail)
         thumbnail.reset();
     isLoaded = false;
+    m_videoPreviewing = false;
+    m_currentVideoFrame = QPixmap();
 }
 
 void ThumbnailWidgetCmp::setupTextLayout() {
@@ -221,7 +245,11 @@ void ThumbnailWidgetCmp::paint(QPainter *painter, const QStyleOptionGraphicsItem
                 ImageLib::recolor(errorIcon, settings->colorScheme().folderview_hc2);
             drawIcon(painter, &errorIcon);
         } else {
-            drawThumbnail(painter, thumbnail->pixmap().get());
+            if (m_videoPreviewing && !m_currentVideoFrame.isNull()) {
+                drawThumbnail(painter, &m_currentVideoFrame);
+            } else {
+                drawThumbnail(painter, thumbnail->pixmap().get());
+            }
             if(isHovered())
                 drawHoverHighlight(painter);
         }

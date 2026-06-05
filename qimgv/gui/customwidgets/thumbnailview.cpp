@@ -1,4 +1,8 @@
 #include "thumbnailview.h"
+#ifdef USE_MPV
+#include "thumbnailvideoplayer.h"
+#endif
+
 
 ThumbnailView::ThumbnailView(Qt::Orientation _orientation, QWidget *parent)
     : QGraphicsView(parent),
@@ -147,6 +151,7 @@ void ThumbnailView::select(QList<int> indices) {
     }
     mSelection = indices;
     updateScrollbarIndicator();
+    updateVideoPreviewsForSelection();
 }
 
 void ThumbnailView::select(int index) {
@@ -193,6 +198,7 @@ void ThumbnailView::clearSelection() {
     for(auto i : mSelection)
         thumbnails.at(i)->setHighlighted(false);
     mSelection.clear();
+    updateVideoPreviewsForSelection();
 }
 
 int ThumbnailView::lastSelected() {
@@ -361,6 +367,7 @@ void ThumbnailView::setThumbnail(int pos, std::shared_ptr<Thumbnail> thumb) {
 }
 
 void ThumbnailView::unloadAllThumbnails() {
+    stopAllVideoPreviews();
     for(int i = 0; i < thumbnails.count(); i++) {
         thumbnails.at(i)->unsetThumbnail();
     }
@@ -401,6 +408,7 @@ void ThumbnailView::loadVisibleThumbnails() {
             }
         }
         // load
+        updateVideoPreviewsForVisible();
         if(loadList.count())
             emit thumbnailsRequested(loadList, static_cast<int>(qApp->devicePixelRatio() * mThumbnailSize), mCropThumbnails, false);
         // unload offscreen
@@ -724,8 +732,158 @@ void ThumbnailView::keyReleaseEvent(QKeyEvent *event) {
 void ThumbnailView::resizeEvent(QResizeEvent *event) {
     QGraphicsView::resizeEvent(event);
     updateScrollbarIndicator();
+    updateVideoPreviewsForSelection();
 }
 
 void ThumbnailView::setSelectMode(ThumbnailSelectMode mode) {
     selectMode = mode;
+}
+
+
+
+
+
+void ThumbnailView::startVideoPreview(int index) {
+#ifdef USE_MPV
+    if (!settings->enableVideoPreviews()) return;
+    if (!checkRange(index)) return;
+    if (activeVideoPlayers.contains(index)) return; // Already playing
+
+    auto thumb = thumbnails.at(index)->getThumbnail();
+    if (!thumb) return;
+
+    QString path = thumb->sourcePath();
+    if (path.isEmpty()) return;
+
+    // Check if it's a video file (using settings->videoFormats())
+    bool isVideo = false;
+    for(auto ext : settings->videoFormats().values()) {
+        if(path.endsWith("." + ext, Qt::CaseInsensitive)) {
+            isVideo = true;
+            break;
+        }
+    }
+    if (!isVideo) return;
+
+    auto* player = new ThumbnailVideoPlayer(this);
+    activeVideoPlayers.insert(index, player);
+
+    // Connect frames to thumbnail widget
+    connect(player, &ThumbnailVideoPlayer::frameReady, this, [this, index, player]() {
+        if (checkRange(index)) {
+            thumbnails.at(index)->setVideoPreviewing(true);
+            thumbnails.at(index)->setVideoFrame(player->currentPixmap());
+        }
+    });
+
+    // Audio rules
+    bool shouldMute = true;
+    if (settings->selectedVideoSound() && selection().contains(index)) {
+        shouldMute = false;
+    }
+    player->setMuted(shouldMute);
+
+    player->loadVideo(path);
+    player->play();
+#endif
+}
+
+void ThumbnailView::stopVideoPreview(int index) {
+#ifdef USE_MPV
+    if (activeVideoPlayers.contains(index)) {
+        auto player = activeVideoPlayers.take(index);
+        player->stop();
+        player->deleteLater();
+        if (checkRange(index)) {
+            thumbnails.at(index)->setVideoPreviewing(false);
+        }
+    }
+#endif
+}
+
+void ThumbnailView::stopAllVideoPreviews() {
+#ifdef USE_MPV
+    for (int idx : activeVideoPlayers.keys()) {
+        stopVideoPreview(idx);
+    }
+#endif
+}
+
+void ThumbnailView::updateVideoPreviewsForSelection() {
+#ifdef USE_MPV
+    if (!settings->enableVideoPreviews()) return;
+
+    // Update mutes
+    for (auto it = activeVideoPlayers.begin(); it != activeVideoPlayers.end(); ++it) {
+        bool shouldMute = true;
+        if (settings->selectedVideoSound() && selection().contains(it.key())) {
+            shouldMute = false;
+        }
+        it.value()->setMuted(shouldMute);
+    }
+
+    if (settings->videoPreviewMode() == VP_PLAY_SELECTED) {
+        // Stop all that are not selected
+        QList<int> toStop;
+        for (int idx : activeVideoPlayers.keys()) {
+            if (!selection().contains(idx)) {
+                toStop.append(idx);
+            }
+        }
+        for (int idx : toStop) {
+            stopVideoPreview(idx);
+        }
+
+        // Start for selected
+        for (int idx : selection()) {
+            startVideoPreview(idx);
+        }
+    }
+#endif
+}
+
+void ThumbnailView::updateVideoPreviewsForVisible() {
+#ifdef USE_MPV
+    if (!settings->enableVideoPreviews()) {
+        stopAllVideoPreviews();
+        return;
+    }
+
+    // Find visible items
+    QRectF visRect = mapToScene(viewport()->geometry()).boundingRect();
+    QList<QGraphicsItem *> visibleItems = scene.items(visRect, Qt::IntersectsItemBoundingRect);
+    QList<int> visibleIndices;
+
+    for (int i = 0; i < visibleItems.count(); i++) {
+        ThumbnailWidget* widget = qgraphicsitem_cast<ThumbnailWidget*>(visibleItems.at(i));
+        if (widget) {
+            int idx = thumbnails.indexOf(widget);
+            visibleIndices.append(idx);
+        }
+    }
+
+    // Stop players that are out of view
+    QList<int> toStop;
+    for (int idx : activeVideoPlayers.keys()) {
+        if (!visibleIndices.contains(idx)) {
+            toStop.append(idx);
+        }
+    }
+    for (int idx : toStop) {
+        stopVideoPreview(idx);
+    }
+
+    // Check what mode we are in
+    if (settings->videoPreviewMode() == VP_PLAY_ALL) {
+        for (int idx : visibleIndices) {
+            startVideoPreview(idx);
+        }
+    } else if (settings->videoPreviewMode() == VP_PLAY_SELECTED) {
+        for (int idx : visibleIndices) {
+            if (selection().contains(idx)) {
+                startVideoPreview(idx);
+            }
+        }
+    }
+#endif
 }

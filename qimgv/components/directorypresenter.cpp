@@ -206,6 +206,7 @@ void DirectoryPresenter::generateThumbnails(QList<int> indexes, int size, bool c
                                                            "Folder",
                                                            size,
                                                            std::shared_ptr<QPixmap>(pixmap)));
+            thumb->setSourcePath(model->filePathAt(i));
             // ^----------------------------------------------------------------
             view->setThumbnail(i, thumb);
         } else {
