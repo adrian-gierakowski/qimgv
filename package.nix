@@ -26,6 +26,7 @@ stdenv.mkDerivation {
     "-DVIDEO_SUPPORT=ON"
     "-DUSE_QT5=OFF"
     "-DKDE_SUPPORT=ON"
+    "-DBUILD_TESTS=ON"
   ];
 
   buildInputs = [
@@ -48,6 +49,9 @@ stdenv.mkDerivation {
   qtWrapperArgs = [
     "--prefix LD_LIBRARY_PATH : ${placeholder "out"}/lib"
   ];
+
+  doCheck = true;
+  preCheck = "export QT_QPA_PLATFORM=offscreen";
 
   meta = with lib; {
     description = "Qt6 image viewer with optional video support";
