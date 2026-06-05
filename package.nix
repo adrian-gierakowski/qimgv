@@ -7,14 +7,14 @@
   exiv2,
   mpv,
   opencv4,
-  src ? null
+  src ? lib.cleanSource ./.
 }:
 
 stdenv.mkDerivation {
   pname = "qimgv";
   version = "unstable";
 
-  src = if src != null then src else throw "A source directory must be provided via the 'src' argument";
+  inherit src;
 
   nativeBuildInputs = [
     cmake
