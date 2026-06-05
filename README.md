@@ -236,6 +236,13 @@ cmake --build build
 QT_QPA_PLATFORM=offscreen ctest --test-dir build/qimgv/tests
 ```
 
+The about commands can also be ran without entering development shell:
+
+```
+nix develop -c cmake -S . -B build
+nix develop -c cmake --build build
+```
+
 Building the flake via `nix build` will also automatically build and run the tests.
 
 # Donate
