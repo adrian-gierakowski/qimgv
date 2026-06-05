@@ -12,7 +12,7 @@
     packages = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      default = pkgs.callPackage ./package.nix { src = nixpkgs.lib.cleanSource self; };
+      default = pkgs.callPackage ./package.nix {};
     });
 
     apps = forAllSystems (system: {

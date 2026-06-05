@@ -7,14 +7,20 @@
   exiv2,
   mpv,
   opencv4,
-  src ? lib.cleanSource ./.
 }:
 
 stdenv.mkDerivation {
   pname = "qimgv";
   version = "unstable";
 
-  inherit src;
+  src = lib.fileset.toSource {
+    root = ./.;
+    fileset = lib.fileset.unions [
+      ./CMakeLists.txt
+      ./qimgv
+      ./plugins
+    ];
+  };
 
   nativeBuildInputs = [
     cmake
