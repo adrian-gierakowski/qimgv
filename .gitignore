@@ -21,3 +21,4 @@ ui_settingsdialog.h
 Makefile
 .cache
 .local
+.config
