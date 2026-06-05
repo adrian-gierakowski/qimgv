@@ -6,7 +6,7 @@ Image viewer. Fast, easy to use. Optional video support.
 
 ## Screenshots
 
-Main window & panel        |  Folder view   |  Settings window  
+Main window & panel        |  Folder view   |  Settings window
 :-------------------------:|:-------------------------:|:-------------------------:|
 [![img1](qimgv/distrib/screenshots/qimgv0.9_1_thumb.jpg)](qimgv/distrib/screenshots/qimgv0.9_1.jpg?raw=true)  |  [![img2](qimgv/distrib/screenshots/qimgv0.9_2_thumb.jpg)](qimgv/distrib/screenshots/qimgv0.9_2.jpg?raw=true) | [![img3](qimgv/distrib/screenshots/qimgv_3_thumb.jpg)](qimgv/distrib/screenshots/qimgv_3.jpg?raw=true)
 
@@ -91,13 +91,13 @@ When you are done press C or M again to hide the panel.
 
 You can run custom scripts on a current image.
 
-Open __Settings > Scripts__. Press Add. Here you can choose between a shell command and a shell script. 
+Open __Settings > Scripts__. Press Add. Here you can choose between a shell command and a shell script.
 
-Example of a command: 
+Example of a command:
 
 `convert %file% %file%_.pdf`
 
-Example of a shell script file (`$1` will be image path): 
+Example of a shell script file (`$1` will be image path):
 ```
 #!/bin/bash
 gimp "$1"
@@ -135,21 +135,21 @@ qimgv can open some extra formats via third-party image plugins. All of them are
 # Installation
 
 ## Windows
-  
+
   Windows builds are portable (everything is contained within the install folder). The installer also sets up file associations.
-  
+
   _NOTE: `-video` variants include mpv for video support_
-  
+
   Grab the latest version from the [releases page](https://github.com/easymodo/qimgv/releases)
 
   Alternatively you can install it with Chocolatey:
-  
+
   ```
   choco install qimgv
   ```
-  
+
   Or WinGet:
-  
+
   ```
   winget install --id easymodo.qimgv
   ```
@@ -158,12 +158,12 @@ qimgv can open some extra formats via third-party image plugins. All of them are
 
 ### Arch Linux / Manjaro / etc.
 
-AUR package: 
+AUR package:
 
 ```
 qimgv-git
 ```
-  
+
 ### Ubuntu / Linux Mint / Pop!\_OS / etc.
 
 ```
@@ -208,7 +208,7 @@ apk add qimgv
 pkg install qimgv
 ```
 
-This list may be incomplete. 
+This list may be incomplete.
 
 ## Compiling from source
 
