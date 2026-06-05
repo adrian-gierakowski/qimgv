@@ -38,6 +38,8 @@ void ThumbnailWidget::updateDpr(qreal newDpr) {
 void ThumbnailWidget::setThumbnailSize(int size) {
     if(mThumbnailSize != size && size > 0) {
         isLoaded = false;
+    m_videoPreviewing = false;
+    m_currentVideoFrame = QPixmap();
         mThumbnailSize = size;
         updateBoundingRect();
         updateGeometry();
@@ -69,6 +71,8 @@ void ThumbnailWidget::reset() {
     highlighted = false;
     hovered = false;
     isLoaded = false;
+    m_videoPreviewing = false;
+    m_currentVideoFrame = QPixmap();
     update();
 }
 
@@ -111,10 +115,30 @@ void ThumbnailWidget::setThumbnail(std::shared_ptr<Thumbnail> _thumbnail) {
     }
 }
 
+
+void ThumbnailWidget::setVideoFrame(const QPixmap &pixmap) {
+    m_currentVideoFrame = pixmap;
+    update();
+}
+
+bool ThumbnailWidget::isVideoPreviewing() const {
+    return m_videoPreviewing;
+}
+
+void ThumbnailWidget::setVideoPreviewing(bool mode) {
+    m_videoPreviewing = mode;
+    if (!mode) {
+        m_currentVideoFrame = QPixmap();
+        update();
+    }
+}
+
 void ThumbnailWidget::unsetThumbnail() {
     if(thumbnail)
         thumbnail.reset();
     isLoaded = false;
+    m_videoPreviewing = false;
+    m_currentVideoFrame = QPixmap();
 }
 
 void ThumbnailWidget::setupTextLayout() {
@@ -214,7 +238,11 @@ void ThumbnailWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
                 ImageLib::recolor(errorIcon, settings->colorScheme().folderview_hc2);
             drawIcon(painter, &errorIcon);
         } else {
-            drawThumbnail(painter, thumbnail->pixmap().get());
+            if (m_videoPreviewing && !m_currentVideoFrame.isNull()) {
+                drawThumbnail(painter, &m_currentVideoFrame);
+            } else {
+                drawThumbnail(painter, thumbnail->pixmap().get());
+            }
             if(isHovered())
                 drawHoverHighlight(painter);
         }

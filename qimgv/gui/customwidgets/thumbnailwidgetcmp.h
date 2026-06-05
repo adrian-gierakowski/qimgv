@@ -32,6 +32,7 @@ public:
 
     bool isLoaded;
     void setThumbnail(std::shared_ptr<Thumbnail> _thumbnail);
+    std::shared_ptr<Thumbnail> getThumbnail() const { return thumbnail; }
 
     void setHighlighted(bool mode);
     bool isHighlighted();
@@ -54,6 +55,10 @@ public:
     void setMargins(int _marginX, int _marginY);
     int thumbnailSize();
     void reset();
+
+    void setVideoFrame(const QPixmap &pixmap);
+    bool isVideoPreviewing() const;
+    void setVideoPreviewing(bool mode);
     void unsetThumbnail();
 
 protected:
@@ -85,4 +90,8 @@ protected:
     QRect drawRectCentered, nameRect, infoRect;
     void updateBoundingRect();
     ThumbnailStyle thumbStyle;
+
+    QPixmap m_currentVideoFrame;
+    bool m_videoPreviewing = false;
+
 };

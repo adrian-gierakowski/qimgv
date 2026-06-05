@@ -22,7 +22,7 @@ add_library(player_mpv MODULE
     src/videoplayer.cpp
     src/mpvwidget.cpp
     src/videoplayermpv.cpp
-    src/qthelper.hpp)
+        src/qthelper.hpp)
 
 target_compile_features(player_mpv PRIVATE cxx_std_11)
 

@@ -39,6 +39,7 @@ std::shared_ptr<Thumbnail> ThumbnailerRunnable::generate(ThumbnailCache* cache, 
     if(!image) {
         if(imgInfo.type() == DocumentType::NONE) {
             std::shared_ptr<Thumbnail> thumbnail(new Thumbnail(imgInfo.fileName(), "", size, nullptr));
+            thumbnail->setSourcePath(path);
             return thumbnail;
         }
         std::pair<QImage*, QSize> pair;
@@ -84,6 +85,7 @@ std::shared_ptr<Thumbnail> ThumbnailerRunnable::generate(ThumbnailCache* cache, 
     }
     std::shared_ptr<QPixmap> pixmapPtr(tmpPixmap);
     std::shared_ptr<Thumbnail> thumbnail(new Thumbnail(imgInfo.fileName(), label, size, pixmapPtr));
+    thumbnail->setSourcePath(path);
     return thumbnail;
 }
 

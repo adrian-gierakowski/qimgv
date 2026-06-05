@@ -170,6 +170,12 @@ void SettingsDialog::setupSidebar() {
 //------------------------------------------------------------------------------
 void SettingsDialog::readSettings() {
     ui->loopSlideshowCheckBox->setChecked(settings->loopSlideshow());
+
+    ui->enableVideoPreviewsCheckBox->setChecked(settings->enableVideoPreviews());
+    ui->previewDurationLimitSpinBox->setValue(settings->previewDurationLimit());
+    ui->videoPreviewModeComboBox->setCurrentIndex(static_cast<int>(settings->videoPreviewMode()));
+    ui->selectedVideoSoundCheckBox->setChecked(settings->selectedVideoSound());
+    ui->videoPreviewsGroupContents->setEnabled(settings->enableVideoPreviews());
     ui->videoPlaybackCheckBox->setChecked(settings->videoPlayback());
     ui->videoPlaybackGroupContents->setEnabled(settings->videoPlayback());
     ui->playSoundsCheckBox->setChecked(settings->playVideoSounds());
@@ -319,6 +325,11 @@ void SettingsDialog::saveSettings() {
 
     settings->setLanguage(langs.key(ui->langComboBox->currentText()));
 
+
+    settings->setEnableVideoPreviews(ui->enableVideoPreviewsCheckBox->isChecked());
+    settings->setPreviewDurationLimit(ui->previewDurationLimitSpinBox->value());
+    settings->setVideoPreviewMode(static_cast<VideoPreviewMode>(ui->videoPreviewModeComboBox->currentIndex()));
+    settings->setSelectedVideoSound(ui->selectedVideoSoundCheckBox->isChecked());
     settings->setVideoPlayback(ui->videoPlaybackCheckBox->isChecked());
     settings->setPlayVideoSounds(ui->playSoundsCheckBox->isChecked());
     settings->setPanelEnabled(ui->enablePanelCheckBox->isChecked());

@@ -10,6 +10,15 @@ Thumbnail::Thumbnail(QString _name, QString _info, int _size, std::shared_ptr<QP
         mHasAlphaChannel = _pixmap->hasAlphaChannel();
 }
 
+
+QString Thumbnail::sourcePath() {
+    return mSourcePath;
+}
+
+void Thumbnail::setSourcePath(QString path) {
+    mSourcePath = path;
+}
+
 QString Thumbnail::name() {
     return mName;
 }
