@@ -12,54 +12,7 @@
     packages = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      default = pkgs.stdenv.mkDerivation {
-        pname = "qimgv";
-        version = "unstable";
-
-        src = self;
-
-        nativeBuildInputs = with pkgs; [
-          cmake
-          pkg-config
-          kdePackages.wrapQtAppsHook
-        ];
-
-        cmakeFlags = [
-          "-DVIDEO_SUPPORT=ON"
-          "-DUSE_QT5=OFF"
-          "-DKDE_SUPPORT=ON"
-        ];
-
-        buildInputs = with pkgs; [
-          exiv2
-          mpv
-          opencv4.cxxdev
-          kdePackages.qtbase
-          kdePackages.qtimageformats
-          kdePackages.qtsvg
-          kdePackages.qttools
-          kdePackages.kimageformats
-          kdePackages.kwindowsystem
-        ];
-
-        postPatch = ''
-          sed -i "s@/usr/bin/mpv@${pkgs.mpv}/bin/mpv@" \
-            qimgv/settings.cpp
-        '';
-
-        qtWrapperArgs = [
-          "--prefix LD_LIBRARY_PATH : ${placeholder "out"}/lib"
-        ];
-
-        meta = with pkgs.lib; {
-          description = "Qt6 image viewer with optional video support";
-          mainProgram = "qimgv";
-          homepage = "https://github.com/easymodo/qimgv";
-          license = licenses.gpl3;
-          platforms = platforms.linux;
-          maintainers = with maintainers; [ cole-h ];
-        };
-      };
+      default = pkgs.callPackage ./package.nix { src = self; };
     });
 
     apps = forAllSystems (system: {
