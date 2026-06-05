@@ -214,6 +214,30 @@ This list may be incomplete.
 
 See [Compiling qimgv from source](https://github.com/easymodo/qimgv/wiki/Compiling-qimgv-from-source) on the wiki
 
+### Compiling from source using Nix
+
+To get a development environment using Nix, run:
+```bash
+nix develop
+```
+
+Inside the environment, you can build qimgv incrementally. To build without running tests (the default):
+```bash
+cmake -S . -B build
+cmake --build build
+```
+
+To build and run tests:
+```bash
+cmake -DBUILD_TESTS=ON -S . -B build
+cmake --build build
+
+# Run tests headlessly
+QT_QPA_PLATFORM=offscreen ctest --test-dir build/qimgv/tests
+```
+
+Building the flake via `nix build` will also automatically build and run the tests.
+
 # Donate
 
 If you wish to give me a few bucks, please consider donating to the Ukrainian Army instead:

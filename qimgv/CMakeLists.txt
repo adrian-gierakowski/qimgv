@@ -66,6 +66,11 @@ if(OPENCV_SUPPORT)
     add_subdirectory(3rdparty/QtOpenCV)
 endif()
 
+option(BUILD_TESTS "Build tests" OFF)
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
+
 # C++ STANDARD
 target_compile_features(qimgv PRIVATE cxx_std_17)
 set_target_properties(qimgv PROPERTIES CXX_EXTENSIONS OFF)
